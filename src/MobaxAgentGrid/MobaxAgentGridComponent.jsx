@@ -310,29 +310,33 @@ export default class MobaxAgentGridComponent extends Component {
                                 this.api.deselectAll()
                             }} className="btn btn-primary">Clear Selection</button>
                             <button onClick={this.onRefreshData} className="btn btn-primary">Refresh Data</button>
-                            <input type="text" id="rowId" value={this.state.rowId} onChange={this.onChangeRowId} placeholder="Type Agent Id for update"/>
-                            <button onClick={this.onUpdateRow} className="btn btn-primary">Update Row</button>
+                            {/*
+                                <input type="text" id="rowId" value={this.state.rowId} onChange={this.onChangeRowId} placeholder="Type Agent Id for update"/>
+                                <button onClick={this.onUpdateRow} className="btn btn-primary">Update Row</button> 
+                            */}
                         </span>
                     </div>
                     <div style={{display: "inline-block", width: "100%", marginTop: 10}}>
                         <span style={{float: "left"}}>
                             <div style={{width: "200px", display: "inline-block"}}>Column API:</div>
                             <button onClick={() => {
-                                this.columnApi.setColumnVisible('country', false)
-                            }} className="btn btn-primary">Hide Country Column</button>
+                                this.columnApi.setColumnVisible('department', false)
+                            }} className="btn btn-primary">Hide Department Column</button>
                             <button onClick={() => {
-                                this.columnApi.setColumnVisible('country', true)
-                            }} className="btn btn-primary">Show Country Column</button>
+                                this.columnApi.setColumnVisible('department', true)
+                            }} className="btn btn-primary">Show Department Column</button>
                         </span>
                     </div>
                     <div style={{display: "inline-block", width: "100%", marginTop: 10, marginBottom: 10}}></div>
                     <span style={{float: "left"}}>
+                            {/*
                             <div style={{width: "200px", display: "inline-block"}}>Filter API:</div>
                             <button onClick={this.invokeSkillsFilterMethod}
                                     className="btn btn-primary">Invoke Skills Filter Method
                             </button>
                             <button onClick={this.dobFilter} className="btn btn-primary">DOB equals to 01/01/2000
                             </button>
+                            */}
                             <div style={{float: "right", marginLeft: 20}}>
                                 <label htmlFor="quickFilter">Quick Filter:&nbsp;</label>
                                 <input type="text" id="quickFilter" onChange={this.onQuickFilterText} placeholder="Type text to filter..."/>
@@ -343,10 +347,12 @@ export default class MobaxAgentGridComponent extends Component {
                             <label htmlFor="sideBarToggle">Show Side Bar&nbsp;</label>
                             <input type="checkbox" id="sideBarToggle" onChange={this.onToggleSidebar} style={{marginRight: 5}}/>
                         </div>
-                        <div style={{float: "right"}}>
-                            <label htmlFor="sortByStatusToggle">Sort By Status&nbsp;</label>
-                            <input type="checkbox" id="sortByStatusToggle" onChange={this.onToggleSortByStatus} style={{marginRight: 5}}/>
-                        </div>
+                    </div>
+                    <div style={{display: "inline-block", width: "100%", marginTop: 10, marginBottom: 10}}>
+                            <div style={{float: "left"}}>
+                                <label htmlFor="sortByStatusToggle">Sort By Status&nbsp;</label>
+                                <input type="checkbox" id="sortByStatusToggle" onChange={this.onToggleSortByStatus} style={{marginRight: 5}}/>
+                            </div>
                     </div>
                     <div style={{height: 600, width: 1500}} className="ag-theme-balham">
                         <AgGridReact
