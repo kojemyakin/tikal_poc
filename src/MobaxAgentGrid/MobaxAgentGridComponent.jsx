@@ -1,14 +1,12 @@
 import React, {Component} from "react";
+import { observable, computed, action, decorate, toJS } from 'mobx';
+import { observer } from 'mobx-react';
 import {AgGridColumn, AgGridReact} from "ag-grid-react";
 import RowDataFactory from "./RowDataFactory";
 import DateComponent from "./DateComponent.jsx";
-import SkillsCellRenderer from './SkillsCellRenderer.jsx';
 import StatusCellRenderer from './StatusCellRenderer.jsx';
 import NameCellEditor from './NameCellEditor.jsx';
-import ProficiencyCellRenderer from './ProficiencyCellRenderer.jsx';
 import RefData from './RefData';
-import SkillsFilter from './SkillsFilter.jsx';
-import ProficiencyFilter from './ProficiencyFilter.jsx';
 import HeaderGroupComponent from './HeaderGroupComponent.jsx';
 import SortableHeaderComponent from './SortableHeaderComponent.jsx';
 
@@ -17,6 +15,7 @@ import "./MobaxAgentGridComponent.css";
 import "ag-grid-enterprise";
 import { isTemplateSpan } from "typescript";
 
+@observer
 export default class MobaxAgentGridComponent extends Component {
     constructor(props) {
         super(props);
@@ -41,8 +40,14 @@ export default class MobaxAgentGridComponent extends Component {
             }
         };
 
+        this.sortByStatus = false;
+        this.mobxTableData = new RowDataFactory().createRowData();
+
         this.onStartTimer();
     }
+
+    @observable sortByStatus;
+    @observable mobxTableData;
 
     onStartTimer = () => {
         let that = this;
@@ -75,9 +80,7 @@ export default class MobaxAgentGridComponent extends Component {
     };
 
     onToggleSortByStatus = (event) => {
-        this.setState({
-            sortByStatus: event.target.checked
-        });
+        this.sortByStatus = event.target.checked;
     };
 
     deselectAll() {
@@ -101,6 +104,8 @@ export default class MobaxAgentGridComponent extends Component {
     };
 
     updateTime = () => {
+        console.log('updateTime');
+
         let newRowData = [];
         let i = 0;
         this.state.rowData.forEach((item) => {
@@ -127,7 +132,7 @@ export default class MobaxAgentGridComponent extends Component {
             // }
         });
 
-        if (this.state.sortByStatus) {
+        if (this.sortByStatus) {
             const orderOfStatuses = [
                 'Online',
                 'Connect',
@@ -149,6 +154,12 @@ export default class MobaxAgentGridComponent extends Component {
                 rowData: newRowData
             });
         }
+    };
+
+    @computed
+    get getFirstRow() {
+        // console.log('getFirstRow');
+        return this.state.rowData[0].name;
     };
 
     onUpdateRow1 = () => {
@@ -296,7 +307,7 @@ export default class MobaxAgentGridComponent extends Component {
                 <h1>AgGrid Example With MobX</h1>
                 <div style={{display: "inline-block", width: "100%"}}>
                     <div style={{float: "left"}}>
-                        <b>Agent Calls Processing: </b>{ this.state.rowCount }
+                        <b>Agent Calls Processing: </b>{ this.state.rowCount } ({ this.getFirstRow })
                     </div>
                 </div>
                 <div style={{marginTop: 10}}>
@@ -327,32 +338,31 @@ export default class MobaxAgentGridComponent extends Component {
                             }} className="btn btn-primary">Show Department Column</button>
                         </span>
                     </div>
-                    <div style={{display: "inline-block", width: "100%", marginTop: 10, marginBottom: 10}}></div>
-                    <span style={{float: "left"}}>
-                            {/*
-                            <div style={{width: "200px", display: "inline-block"}}>Filter API:</div>
-                            <button onClick={this.invokeSkillsFilterMethod}
-                                    className="btn btn-primary">Invoke Skills Filter Method
-                            </button>
-                            <button onClick={this.dobFilter} className="btn btn-primary">DOB equals to 01/01/2000
-                            </button>
-                            */}
-                            <div style={{float: "right", marginLeft: 20}}>
-                                <label htmlFor="quickFilter">Quick Filter:&nbsp;</label>
-                                <input type="text" id="quickFilter" onChange={this.onQuickFilterText} placeholder="Type text to filter..."/>
-                            </div>
-                    </span>
+                    <div style={{display: "inline-block", width: "100%", marginTop: 10, marginBottom: 10}}>
+                        <span style={{float: "left"}}>
+                                {/*
+                                <div style={{width: "200px", display: "inline-block"}}>Filter API:</div>
+                                <button onClick={this.invokeSkillsFilterMethod}
+                                        className="btn btn-primary">Invoke Skills Filter Method
+                                </button>
+                                <button onClick={this.dobFilter} className="btn btn-primary">DOB equals to 01/01/2000
+                                </button>
+                                */}
+                            <div style={{width: "200px", display: "inline-block", marginRight: 5}}>Quick Filter:</div>
+                            <input type="text" id="quickFilter" onChange={this.onQuickFilterText} placeholder="Type text to filter..."/>
+                        </span>
+                    </div>
                     <div style={{display: "inline-block", width: "100%", marginTop: 10, marginBottom: 10}}>
                         <div style={{float: "left"}}>
-                            <label htmlFor="sideBarToggle">Show Side Bar&nbsp;</label>
+                            <div style={{width: "200px", display: "inline-block", marginRight: 5}}>Show Side Bar:</div>
                             <input type="checkbox" id="sideBarToggle" onChange={this.onToggleSidebar} style={{marginRight: 5}}/>
                         </div>
                     </div>
                     <div style={{display: "inline-block", width: "100%", marginTop: 10, marginBottom: 10}}>
-                            <div style={{float: "left"}}>
-                                <label htmlFor="sortByStatusToggle">Sort By Status&nbsp;</label>
-                                <input type="checkbox" id="sortByStatusToggle" onChange={this.onToggleSortByStatus} style={{marginRight: 5}}/>
-                            </div>
+                        <div style={{float: "left"}}>
+                            <div style={{width: "200px", display: "inline-block", marginRight: 5}}>Sort By Status:</div>
+                            <input type="checkbox" id="sortByStatusToggle" onChange={this.onToggleSortByStatus} style={{marginRight: 5}}/>
+                        </div>
                     </div>
                     <div style={{height: 600, width: 1500}} className="ag-theme-balham">
                         <AgGridReact

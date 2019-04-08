@@ -1,13 +1,13 @@
+import { observable, computed, action, decorate, toJS } from 'mobx';
+
 import RefData from './RefData';
 
 export default class RowDataFactory {
 
     createRowData() {
-        const rowData = [];
+        const rowData = observable([]);
 
-        console.log("AAAAAA createRowData");
-
-        for (let i = 0; i < 2000; i++) {
+        for (let i = 0; i < 15; i++) {
             const countryData = RefData.COUNTRIES[i % RefData.COUNTRIES.length];
             const departmentData = RefData.DEPARTMENTS[i % RefData.DEPARTMENTS.length];
             rowData.push({
@@ -20,10 +20,6 @@ export default class RowDataFactory {
                     windows: Math.random() < 0.4,
                     css: Math.random() < 0.4
                 },
-                dob: RefData.DOB[i % RefData.DOB.length],
-                address: RefData.ADDRESSES[i % RefData.ADDRESSES.length],
-                years: Math.round(Math.random() * 100),
-                proficiency: Math.round(Math.random() * 100),
                 country: countryData.country,
                 continent: countryData.continent,
                 language: countryData.language,

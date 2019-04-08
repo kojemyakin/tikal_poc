@@ -22,8 +22,7 @@ module.exports = {
                 query: {
                     presets: ['@babel/preset-react', '@babel/preset-env'],
                     plugins: [
-                        require('@babel/plugin-proposal-function-bind'),
-                        require('@babel/plugin-proposal-class-properties')
+                        require('@babel/plugin-proposal-function-bind')
                     ]
                 }
             },
