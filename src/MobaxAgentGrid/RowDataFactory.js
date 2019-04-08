@@ -7,7 +7,7 @@ export default class RowDataFactory {
     createRowData() {
         const rowData = observable([]);
 
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 200; i++) {
             const countryData = RefData.COUNTRIES[i % RefData.COUNTRIES.length];
             const departmentData = RefData.DEPARTMENTS[i % RefData.DEPARTMENTS.length];
             rowData.push({

@@ -27,8 +27,6 @@ export default class MobaxAgentGridComponent extends Component {
             quickFilterText: null,
             sideBar: false,
             sortByStatus: false,
-            rowData: new RowDataFactory().createRowData(),
-            rowCount: null,
             rowId: "",
             icons: {
                 columnRemoveFromGroup: '<i class="fa fa-times"/>',
@@ -40,12 +38,14 @@ export default class MobaxAgentGridComponent extends Component {
             }
         };
 
+        this.rowCount = 0;
         this.sortByStatus = false;
         this.mobxTableData = new RowDataFactory().createRowData();
 
         this.onStartTimer();
     }
 
+    @observable rowCount;
     @observable sortByStatus;
     @observable mobxTableData;
 
@@ -98,9 +98,7 @@ export default class MobaxAgentGridComponent extends Component {
     };
 
     onRefreshData = () => {
-        this.setState({
-            rowData: new RowDataFactory().createRowData()
-        });
+        this.mobxTableData = new RowDataFactory().createRowData();
     };
 
     updateTime = () => {
@@ -108,28 +106,20 @@ export default class MobaxAgentGridComponent extends Component {
 
         let newRowData = [];
         let i = 0;
-        this.state.rowData.forEach((item) => {
-            // if (item.id == this.state.rowId) {
-                var newItem = {
-                    id: item.id,
-                    name: item.name,
-                    department: item.department,
-                    status: RefData.AGENT_STATUS_CODES[Math.round(Math.random() * 10000) % RefData.AGENT_STATUS_CODES.length].name,
-                    login: 0,
-                    status_idle: this.time,
-                    status_lactive: this.time,
-                    status_mission: this.time,
-                    status_mactive: this.time,
-                    status_pause: this.time,
-                    status_fpause: this.time,
-                    status_d_hold: this.time,
-                    calls: item.calls + 10,
-                    incoming: item.incoming + 12
-                }
-                newRowData.push(newItem);
-            // } else {
-            //     newRowData.push(item);
-            // }
+        this.mobxTableData.forEach((item) => {
+            item.status = RefData.AGENT_STATUS_CODES[Math.round(Math.random() * 10000) % RefData.AGENT_STATUS_CODES.length].name;
+            item.login = item.login + 1;
+            item.status_idle = this.time;
+            item.status_lactive = this.time;
+            item.status_mission = this.time;
+            item.status_mactive = this.time;
+            item.status_pause = this.time;
+            item.status_fpause = this.time;
+            item.status_d_hold = this.time;
+            item.calls = item.calls + 10;
+            item.incoming = item.incoming + 12;
+
+            newRowData.push(item);
         });
 
         if (this.sortByStatus) {
@@ -146,128 +136,30 @@ export default class MobaxAgentGridComponent extends Component {
                 sortData = sortData.concat(statusData);
             });
 
-            this.setState({
-                rowData: sortData
-            });
+            var sort = [
+                {colId: 'status', sort: 'asc'}
+            ];
+
+            this.api.updateRowData({ update: sortData });
+            this.api.setSortModel(sort);
         } else {
-            this.setState({
-                rowData: newRowData
-            });
+            this.api.updateRowData({ update: newRowData });
+            this.api.setSortModel(null);
         }
     };
 
     @computed
     get getFirstRow() {
         // console.log('getFirstRow');
-        return this.state.rowData[0].name;
-    };
-
-    onUpdateRow1 = () => {
-        let newRowData = [];
-        let i = 0;
-        this.state.rowData.forEach((item) => {
-            // console.log("item", item);
-            if (i++ < 15) {
-                newRowData.push({
-                    id: 1000,
-                    name: "New name"
-                });
-            } else {
-                newRowData.push(item); 
-            }
-            // item.id = 1000;
-            // item.name = "New Name";
-            // newRowData.push(item);
-        });
-
-        console.log('state.rowData: ', newRowData, this.state.rowId);
-
-        this.setState({
-            rowData: newRowData
-        });
-        // this.forceUpdate();
-    };
-
-    onUpdateRow2 = () => {
-        let newRowData = [];
-        let i = 0;
-        this.state.rowData.forEach((item) => {
-            if (item.id == this.state.rowId) {
-                console.log("Updated Agent");
-                
-                var newItem = {
-                    id: item.id,
-                    name: "Updated Agent"
-                }
-                newRowData.push(newItem);
-            } else {
-                newRowData.push(item);
-            }
-        });
-
-        console.log('state.rowData: ', newRowData, this.state.rowId);
-
-        this.setState({
-            rowData: newRowData
-        });
-        // this.forceUpdate();
-    };
-
-    onUpdateRow = () => {
-        let newRowData = [];
-        let i = 0;
-        console.log(this.state.rowData.length);
-        for (let i = 0; i < this.state.rowData.length; i++) {
-            let item = this.state.rowData[i];
-
-            if (item.id == this.state.rowId) {
-                console.log('new item');
-
-                var newItem = {
-                    id: item.id,
-                    name: "Updated Agent 2"
-                }
-
-                this.state.rowData[i] = newItem;
-            }
-        }
-
-        console.log(this.state.rowData);
-        this.setState({
-            rowData: this.state.rowData
-        });
-        // this.forceUpdate();
-    };
-
-    invokeSkillsFilterMethod = () => {
-        let skillsFilter = this.api.getFilterInstance('skills');
-        let componentInstance = skillsFilter.getFrameworkComponentInstance();
-        componentInstance.helloFromSkillsFilter();
-    };
-
-    dobFilter = () => {
-        let dateFilterComponent = this.api.getFilterInstance('dob');
-        dateFilterComponent.setModel({
-            type: 'equals',
-            dateFrom: '2000-01-01'
-        });
-
-        // as the date filter is a React component, and its using setState internally, we need
-        // to allow time for the state to be set (as setState is an async operation)
-        // simply wait for the next tick
-        setTimeout(() => {
-            this.api.onFilterChanged();
-        });
+        return this.mobxTableData[0].name;
     };
 
     calculateRowCount = () => {
-        if (this.api && this.state.rowData) {
+        if (this.api && this.mobxTableData) {
             const model = this.api.getModel();
-            const totalRows = this.state.rowData.length;
+            const totalRows = this.mobxTableData.length;
             const processedRows = model.getRowCount();
-            this.setState({
-                rowCount: processedRows.toLocaleString() + ' / ' + totalRows.toLocaleString()
-            });
+            this.rowCount = processedRows.toLocaleString() + ' / ' + totalRows.toLocaleString()
         }
     };
 
@@ -307,7 +199,7 @@ export default class MobaxAgentGridComponent extends Component {
                 <h1>AgGrid Example With MobX</h1>
                 <div style={{display: "inline-block", width: "100%"}}>
                     <div style={{float: "left"}}>
-                        <b>Agent Calls Processing: </b>{ this.state.rowCount } ({ this.getFirstRow })
+                        <b>Agent Calls Processing: </b>{ this.rowCount } ({ this.getFirstRow })
                     </div>
                 </div>
                 <div style={{marginTop: 10}}>
@@ -380,7 +272,7 @@ export default class MobaxAgentGridComponent extends Component {
                             icons={this.state.icons}
 
                             // binding to array properties
-                            rowData={this.state.rowData}
+                            rowData={this.mobxTableData}
 
                             // no binding, just providing hard coded strings for the properties
                             // boolean properties will default to true if provided (ie suppressRowClickSelection => suppressRowClickSelection="true")
