@@ -1,6 +1,6 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import RefData from './RefData';
+import RefData from '../stores/RefData';
 
 export default class StatusCellRenderer extends React.Component {
 

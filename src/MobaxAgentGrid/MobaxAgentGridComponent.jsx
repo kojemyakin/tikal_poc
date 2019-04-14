@@ -2,18 +2,20 @@ import React, {Component} from "react";
 import { observable, computed, action, decorate, toJS } from 'mobx';
 import { observer } from 'mobx-react';
 import {AgGridColumn, AgGridReact} from "ag-grid-react";
-import RowDataFactory from "./RowDataFactory";
+import RowDataFactory from "../stores/RowDataFactory";
 import DateComponent from "./DateComponent.jsx";
 import StatusCellRenderer from './StatusCellRenderer.jsx';
 import NameCellEditor from './NameCellEditor.jsx';
-import RefData from './RefData';
+import RefData from '../stores/RefData';
 import HeaderGroupComponent from './HeaderGroupComponent.jsx';
 import SortableHeaderComponent from './SortableHeaderComponent.jsx';
+
+import agentsStore from "../stores/AgentsStore";
 
 import "./MobaxAgentGridComponent.css";
 // take this line out if you do not want to use ag-Grid-Enterprise
 import "ag-grid-enterprise";
-import { isTemplateSpan } from "typescript";
+import { isTemplateSpan, isTaggedTemplateExpression } from "typescript";
 
 @observer
 export default class MobaxAgentGridComponent extends Component {
@@ -40,7 +42,10 @@ export default class MobaxAgentGridComponent extends Component {
 
         this.rowCount = 0;
         this.sortByStatus = false;
-        this.mobxTableData = new RowDataFactory().createRowData();
+        this.mobxTableData = new RowDataFactory().createRowData(50);
+
+        console.log('EXTERNAL STORE:', agentsStore.agents);
+        console.log('INTERNAL STORE:', this.mobxTableData);
 
         this.onStartTimer();
     }
@@ -54,7 +59,8 @@ export default class MobaxAgentGridComponent extends Component {
 
         this.state.timerId = setInterval(function () {
             that.time++;
-            that.updateTime();
+            // that.updateTime();
+            that.updateTimeExternal();
         }, 1000);
     };
 
@@ -98,7 +104,7 @@ export default class MobaxAgentGridComponent extends Component {
     };
 
     onRefreshData = () => {
-        this.mobxTableData = new RowDataFactory().createRowData();
+        this.mobxTableData = new RowDataFactory().createRowData(50);
     };
 
     updateTime = () => {
@@ -107,6 +113,53 @@ export default class MobaxAgentGridComponent extends Component {
         let newRowData = [];
         let i = 0;
         this.mobxTableData.forEach((item) => {
+            item.status = RefData.AGENT_STATUS_CODES[Math.round(Math.random() * 10000) % RefData.AGENT_STATUS_CODES.length].name;
+            item.login = item.login + 1;
+            item.status_idle = this.time;
+            item.status_lactive = this.time;
+            item.status_mission = this.time;
+            item.status_mactive = this.time;
+            item.status_pause = this.time;
+            item.status_fpause = this.time;
+            item.status_d_hold = this.time;
+            item.calls = item.calls + 10;
+            item.incoming = item.incoming + 12;
+
+            newRowData.push(item);
+        });
+
+        if (this.sortByStatus) {
+            const orderOfStatuses = [
+                'Online',
+                'Connect',
+                'Pause',
+                'ForcePause',
+                'Mission',
+            ];
+            let sortData = [];
+            orderOfStatuses.forEach(st => {
+                let statusData = newRowData.filter( d => d.status === st);
+                sortData = sortData.concat(statusData);
+            });
+
+            var sort = [
+                {colId: 'status', sort: 'asc'}
+            ];
+
+            this.api.updateRowData({ update: sortData });
+            this.api.setSortModel(sort);
+        } else {
+            this.api.updateRowData({ update: newRowData });
+            this.api.setSortModel(null);
+        }
+    };
+
+    updateTimeExternal = () => {
+        console.log('updateTimeExternal');
+
+        let newRowData = [];
+        let i = 0;
+        agentsStore.agents.forEach((item) => {
             item.status = RefData.AGENT_STATUS_CODES[Math.round(Math.random() * 10000) % RefData.AGENT_STATUS_CODES.length].name;
             item.login = item.login + 1;
             item.status_idle = this.time;
@@ -272,7 +325,8 @@ export default class MobaxAgentGridComponent extends Component {
                             icons={this.state.icons}
 
                             // binding to array properties
-                            rowData={this.mobxTableData}
+                            // rowData={this.mobxTableData}
+                            rowData={agentsStore.agents}
 
                             // no binding, just providing hard coded strings for the properties
                             // boolean properties will default to true if provided (ie suppressRowClickSelection => suppressRowClickSelection="true")

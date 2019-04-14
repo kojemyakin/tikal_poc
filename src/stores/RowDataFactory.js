@@ -4,10 +4,10 @@ import RefData from './RefData';
 
 export default class RowDataFactory {
 
-    createRowData() {
+    createRowData(items) {
         const rowData = observable([]);
 
-        for (let i = 0; i < 200; i++) {
+        for (let i = 0; i < items; i++) {
             const countryData = RefData.COUNTRIES[i % RefData.COUNTRIES.length];
             const departmentData = RefData.DEPARTMENTS[i % RefData.DEPARTMENTS.length];
             rowData.push({
