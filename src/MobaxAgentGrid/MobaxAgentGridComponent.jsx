@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import { observable, computed, action, decorate, toJS } from 'mobx';
+import { observable, computed, reaction, action, decorate, toJS } from 'mobx';
 import { observer } from 'mobx-react';
 import {AgGridColumn, AgGridReact} from "ag-grid-react";
 import RowDataFactory from "../stores/RowDataFactory";
@@ -23,9 +23,11 @@ export default class MobaxAgentGridComponent extends Component {
         super(props);
 
         this.time = 0;
+        this.timerId = null;
+        this.reaction = null;
+        this.records = [];
 
         this.state = {
-            timerId: null,
             quickFilterText: null,
             sideBar: false,
             sortByStatus: false,
@@ -44,23 +46,52 @@ export default class MobaxAgentGridComponent extends Component {
         this.sortByStatus = false;
         this.mobxTableData = new RowDataFactory().createRowData(50);
 
-        console.log('EXTERNAL STORE:', agentsStore.agents);
-        console.log('INTERNAL STORE:', this.mobxTableData);
+        // console.log('EXTERNAL STORE:', agentsStore.agents);
+        // console.log('INTERNAL STORE:', this.mobxTableData);
 
-        this.onStartTimer();
     }
 
     @observable rowCount;
     @observable sortByStatus;
     @observable mobxTableData;
 
+    componentDidMount() {
+        this.onStartTimer();
+        this.onGridUpdateTimer();
+
+        // agents => console.log("reaction 1:", todos.map(todo => todo.title).join(", "))
+
+        let that = this;
+        agentsStore.agents.forEach((item) => {
+            that.trackAgent(item);
+        });
+
+    }
+
     onStartTimer = () => {
         let that = this;
 
-        this.state.timerId = setInterval(function () {
-            that.time++;
-            // that.updateTime();
-            that.updateTimeExternal();
+        if (this.timerId == null) {
+            console.log('start timer');
+            this.timerId = setInterval(function () {
+                that.time++;
+                // that.updateTime();
+                that.updateTimeExternal();
+            }, 1000);
+        }
+    };
+
+    onGridUpdateTimer = () => {
+        let that = this;
+
+        setInterval(function () {
+            console.log('update grid');
+
+            if (that.records.length > 0) {
+                that.api.updateRowData({ update: that.records });
+                that.records = [];
+                that.api.setSortModel(null);
+            }
         }, 1000);
     };
 
@@ -104,7 +135,10 @@ export default class MobaxAgentGridComponent extends Component {
     };
 
     onRefreshData = () => {
-        this.mobxTableData = new RowDataFactory().createRowData(50);
+        // this.mobxTableData = new RowDataFactory().createRowData(50);
+        // agentsStore.agents = new RowDataFactory().createRowData(200);
+
+        console.log('new store', agentsStore.agents);
     };
 
     updateTime = () => {
@@ -155,7 +189,13 @@ export default class MobaxAgentGridComponent extends Component {
     };
 
     updateTimeExternal = () => {
-        console.log('updateTimeExternal');
+        console.log('updateTime', this.timerId);
+
+        const it = agentsStore.agents[0];
+
+        if (it.login >= 15) {
+            return;
+        }
 
         let newRowData = [];
         let i = 0;
@@ -171,6 +211,7 @@ export default class MobaxAgentGridComponent extends Component {
             item.status_d_hold = this.time;
             item.calls = item.calls + 10;
             item.incoming = item.incoming + 12;
+            item.update = !item.update;
 
             newRowData.push(item);
         });
@@ -196,10 +237,29 @@ export default class MobaxAgentGridComponent extends Component {
             this.api.updateRowData({ update: sortData });
             this.api.setSortModel(sort);
         } else {
-            this.api.updateRowData({ update: newRowData });
-            this.api.setSortModel(null);
+            // this.api.updateRowData({ update: newRowData });
+            // this.api.setSortModel(null);
         }
     };
+
+    trackAgent(agent) {
+        const agentDisposer = reaction(
+            () => toJS(agent),
+            jsAgent => {
+                // console.log(`Update ${agent.name}:\n${stringify(agent)}`);
+                console.log('Reaction agent', agent);
+                const jsAgents = [];
+                jsAgents.push(agent);
+                // this.gridApi.updateRowData({ update: jsOrders });
+
+                this.records.push(agent);
+
+                // this.api.updateRowData({ update: jsAgents });
+                // this.api.setSortModel(null);
+            }
+        );
+        // this.discreteOrderDisposerMap.set(order.id, orderDisposer);
+    }
 
     @computed
     get getFirstRow() {

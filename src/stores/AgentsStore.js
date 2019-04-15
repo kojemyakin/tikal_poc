@@ -1,6 +1,6 @@
 import * as mobx from "mobx";
 // , { observable, action, computed } from 'mobx';
-// import { observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 
 import RowDataFactory from "../stores/RowDataFactory";
 import Agent from "../classes/Agent";
@@ -8,12 +8,13 @@ import Agent from "../classes/Agent";
 //Enforcing Mobx Strict Mode - only change through @actions
 // mobx.useStrict(true);
 
+// @observer
 class AgentsStore {
     agents = mobx.observable([]);
 
     initAgents(iterations = 20) {
         this.agents = new RowDataFactory().createRowData(iterations);
-        console.log('agents', this.agents);
+        // console.log('agents', this.agents);
     }
 
     @mobx.action
@@ -40,6 +41,6 @@ class AgentsStore {
 }
 
 let agentsStore = new AgentsStore();
-agentsStore.initAgents(25);
+agentsStore.initAgents(50);
 
 export default agentsStore;

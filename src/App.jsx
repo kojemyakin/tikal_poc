@@ -5,6 +5,7 @@ import NavItem from "./NavItem";
 
 import AgentGridComponent from "./AgentGrid/AgentGridComponent";
 import MobaxAgentGridComponent from "./MobaxAgentGrid/MobaxAgentGridComponent";
+import ExternalManager from "./MobaxAgentGrid/ExternalManager";
 import SimpleReduxDynamicExample from "./simpleReduxDynamicComponentExample/SimpleReduxExample";
 import SimpleReduxHookExample from "./simpleReduxHooksExample/SimpleReduxHookExample";
 
@@ -13,6 +14,7 @@ const SideBar = () => (
         <ul className="nav nav-pills">
             <NavItem to='/agent-grid'>Agents Grid</NavItem>
             <NavItem to='/mobax-agent-grid'>Mobax Agents Grid</NavItem>
+            <NavItem to='/external'>ExternalManager</NavItem>
             {/* 
               <NavItem to='/simple-redux-dynamic'>Simple Redux Dynamic Component Example</NavItem>
               <NavItem to='/simple-redux-hook'>Simple React Hook Component Example</NavItem>
@@ -31,6 +33,7 @@ class App extends Component {
                         <Redirect from="/" exact to="/agent-grid"/>
                         <Route exact path='/agent-grid' component={AgentGridComponent}/>
                         <Route exact path='/mobax-agent-grid' component={MobaxAgentGridComponent}/>
+                        <Route exact path='/external' component={ExternalManager}/>
                         <Route exact path='/simple-redux-dynamic' component={SimpleReduxDynamicExample}/>
                         <Route exact path='/simple-redux-hook' component={SimpleReduxHookExample}/>
                     </Switch>
