@@ -26,6 +26,7 @@ export default class MobaxAgentGridComponent extends Component {
         this.timerId = null;
         this.reaction = null;
         this.records = [];
+        this.sort = null;
 
         this.state = {
             quickFilterText: null,
@@ -90,7 +91,7 @@ export default class MobaxAgentGridComponent extends Component {
             if (that.records.length > 0) {
                 that.api.updateRowData({ update: that.records });
                 that.records = [];
-                that.api.setSortModel(null);
+                that.api.setSortModel(that.sort);
             }
         }, 1000);
     };
@@ -230,13 +231,17 @@ export default class MobaxAgentGridComponent extends Component {
                 sortData = sortData.concat(statusData);
             });
 
-            var sort = [
+            // this.records = sortData;
+
+            this.sort = [
                 {colId: 'status', sort: 'asc'}
             ];
 
-            this.api.updateRowData({ update: sortData });
-            this.api.setSortModel(sort);
+            // this.api.updateRowData({ update: sortData });
+            // this.api.setSortModel(sort);
         } else {
+            this.sort = null;
+
             // this.api.updateRowData({ update: newRowData });
             // this.api.setSortModel(null);
         }

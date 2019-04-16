@@ -1,8 +1,9 @@
 import React from 'react';
 import { observable, computed, action, decorate, toJS } from 'mobx';
-// import RefData from './RefData';
+
 
 import agentsStore from "../stores/AgentsStore";
+import RefData from '../stores/RefData';
 
 // the skills filter component. this can be laid out much better in a 'React'
 // way. there are design patterns you can apply to layout out your React classes.
@@ -55,6 +56,7 @@ export default class ExternalManager extends React.Component {
     externalTimer() {
         setInterval(function () {
             agentsStore.agents.forEach((item) => {
+                item.status = RefData.AGENT_STATUS_CODES[Math.round(Math.random() * 10000) % RefData.AGENT_STATUS_CODES.length].name;
                 item.login = item.login + 1;
                 item.status_idle = item.status_idle + 1;
                 item.status_lactive = item.status_lactive + 1;
