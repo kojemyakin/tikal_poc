@@ -10,7 +10,7 @@ import RefData from '../stores/RefData';
 import HeaderGroupComponent from './HeaderGroupComponent.jsx';
 import SortableHeaderComponent from './SortableHeaderComponent.jsx';
 
-import WidgetTopIdles from './WidgetTopIdles';
+import WidgetTopAgents from './WidgetTopAgents';
 
 import agentsStore from "../stores/AgentsStore";
 
@@ -254,7 +254,7 @@ export default class MobaxAgentGridComponent extends Component {
             () => toJS(agent),
             jsAgent => {
                 // console.log(`Update ${agent.name}:\n${stringify(agent)}`);
-                console.log('Reaction agent', agent);
+                // console.log('Reaction agent', agent);
                 const jsAgents = [];
                 jsAgents.push(agent);
                 // this.gridApi.updateRowData({ update: jsOrders });
@@ -494,13 +494,13 @@ export default class MobaxAgentGridComponent extends Component {
                     </div>
                     <div style={{display: "inline-block", width: "100%", marginTop: 10, marginBottom: 10}}>
                         <div style={{float: "left", marginRight: 10}}>
-                            <WidgetTopIdles timerProperty={"idle"} />
+                            <WidgetTopAgents timerProperty={"idle"} />
                         </div>
                         <div style={{float: "left", marginRight: 10}}>
-                            <WidgetTopIdles timerProperty={"missin"} />
+                            <WidgetTopAgents timerProperty={"mission"} />
                         </div>
                         <div style={{float: "left"}}>
-                            <WidgetTopIdles timerProperty={"pause"} />
+                            <WidgetTopAgents timerProperty={"pause"} />
                         </div>
                     </div>
                 </div>
