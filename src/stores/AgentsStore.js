@@ -41,6 +41,6 @@ class AgentsStore {
 }
 
 let agentsStore = new AgentsStore();
-agentsStore.initAgents(50);
+agentsStore.initAgents(10);
 
 export default agentsStore;

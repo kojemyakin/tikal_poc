@@ -45,7 +45,7 @@ export default class MobaxAgentGridComponent extends Component {
 
         this.rowCount = 0;
         this.sortByStatus = false;
-        this.mobxTableData = new RowDataFactory().createRowData(50);
+        this.mobxTableData = new RowDataFactory().createRowData(10);
 
         // console.log('EXTERNAL STORE:', agentsStore.agents);
         // console.log('INTERNAL STORE:', this.mobxTableData);
@@ -194,7 +194,7 @@ export default class MobaxAgentGridComponent extends Component {
 
         const it = agentsStore.agents[0];
 
-        if (it.login >= 15) {
+        if (it.login >= 250) {
             return;
         }
 
@@ -202,14 +202,14 @@ export default class MobaxAgentGridComponent extends Component {
         let i = 0;
         agentsStore.agents.forEach((item) => {
             item.status = RefData.AGENT_STATUS_CODES[Math.round(Math.random() * 10000) % RefData.AGENT_STATUS_CODES.length].name;
-            item.login = item.login + 1;
-            item.status_idle = this.time;
-            item.status_lactive = this.time;
-            item.status_mission = this.time;
-            item.status_mactive = this.time;
-            item.status_pause = this.time;
-            item.status_fpause = this.time;
-            item.status_d_hold = this.time;
+            item.login = item.login + Math.round(Math.random() * 10000) % 5;
+            item.status_idle = item.status_idle + Math.round(Math.random() * 10000) % 5;
+            item.status_lactive = item.status_lactive + Math.round(Math.random() * 10000) % 5;
+            item.status_mission = item.status_mission + Math.round(Math.random() * 10000) % 5;
+            item.status_mactive = item.status_mactive + Math.round(Math.random() * 10000) % 5;
+            item.status_pause = item.status_pause + Math.round(Math.random() * 10000) % 5;
+            item.status_fpause = item.status_fpause + Math.round(Math.random() * 10000) % 5;
+            item.status_d_hold = item.status_d_hold + Math.round(Math.random() * 10000) % 5;
             item.calls = item.calls + 10;
             item.incoming = item.incoming + 12;
             item.update = !item.update;
