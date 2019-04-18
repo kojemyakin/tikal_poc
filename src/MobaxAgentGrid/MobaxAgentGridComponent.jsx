@@ -10,6 +10,8 @@ import RefData from '../stores/RefData';
 import HeaderGroupComponent from './HeaderGroupComponent.jsx';
 import SortableHeaderComponent from './SortableHeaderComponent.jsx';
 
+import WidgetTopIdles from './WidgetTopIdles';
+
 import agentsStore from "../stores/AgentsStore";
 
 import "./MobaxAgentGridComponent.css";
@@ -374,7 +376,7 @@ export default class MobaxAgentGridComponent extends Component {
                             <input type="checkbox" id="sortByStatusToggle" onChange={this.onToggleSortByStatus} style={{marginRight: 5}}/>
                         </div>
                     </div>
-                    <div style={{height: 600, width: 1500}} className="ag-theme-balham">
+                    <div style={{height: 400, width: 1500}} className="ag-theme-balham">
                         <AgGridReact
                             // listening for events
                             onGridReady={this.onGridReady}
@@ -489,6 +491,17 @@ export default class MobaxAgentGridComponent extends Component {
                                 <AgGridColumn field="incoming" width={100} filter="text"/>
                             </AgGridColumn>
                         </AgGridReact>
+                    </div>
+                    <div style={{display: "inline-block", width: "100%", marginTop: 10, marginBottom: 10}}>
+                        <div style={{float: "left", marginRight: 10}}>
+                            <WidgetTopIdles timerProperty={"idle"} />
+                        </div>
+                        <div style={{float: "left", marginRight: 10}}>
+                            <WidgetTopIdles timerProperty={"missin"} />
+                        </div>
+                        <div style={{float: "left"}}>
+                            <WidgetTopIdles timerProperty={"pause"} />
+                        </div>
                     </div>
                 </div>
             </div>
